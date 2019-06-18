@@ -152,7 +152,7 @@ class Client
      */
     public function prepareJson(string $method, array $params = null): string
     {
-        if ($params === null) {
+        if (($params === null) || empty($params)) {
             $params = new \stdClass();
         }
         $request = ['method' => $method, 'params' => []];
