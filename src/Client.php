@@ -52,7 +52,7 @@ class Client
             case 'array':
                 $this->setEndpoint($config['endpoint'] ?? null);
                 if(isset($config["user"]) && isset($config["password"]) ){
-                    $this->set($config["user"], $config["password"]);
+                    $this->setAuth($config["user"], $config["password"]);
                 }
                 break;
 
