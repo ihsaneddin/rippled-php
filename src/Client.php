@@ -32,6 +32,9 @@ class Client
     /** @var string http or https */
     private $scheme;
 
+    protected $auth= [];
+    protected $adminAuth= [];
+
     /**
      * Connection constructor.
      * @param $config
@@ -48,6 +51,9 @@ class Client
 
             case 'array':
                 $this->setEndpoint($config['endpoint'] ?? null);
+                if(isset($config["user"]) && isset($config["password"]) ){
+                    $this->set($config["user"], $config["password"]);
+                }
                 break;
 
             default:
@@ -103,6 +109,14 @@ class Client
         }
     }
 
+    public function setAuth(string $user, string $password){
+        $this->auth = [$user, $password];
+    }
+
+    public function getAuth(){
+        return $this->auth;
+    } 
+
     /**
      * @param string $methodName
      * @param array $params
@@ -134,11 +148,17 @@ class Client
     public function post(string $method, array $params = null)
     {
         $json = $this->prepareJson($method, $params);
-
+        $headers = ['Content-Type' => 'application/json'];
+        $auth = $this->getAuth();
+        if(!empty($auth)){
+            $auth = implode($auth, ':');
+            $auth = \base64_encode($auth);
+            $headers["Authorization"] = "Basic ".$auth;
+        }
         $request = $this->getMessageFactory()->createRequest(
             'POST',
             $this->endpoint,
-            ['Content-Type' => 'application/json'],
+            $headers,
             $json
         );
 
